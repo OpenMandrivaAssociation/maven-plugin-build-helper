@@ -1,6 +1,6 @@
 Name:           maven-plugin-build-helper
 Version:        1.5
-Release:        3
+Release:        5
 Summary:        Build Helper Maven Plugin
 
 Group:          Development/Java
