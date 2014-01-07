@@ -1,106 +1,96 @@
+%{?_javapackages_macros:%_javapackages_macros}
 Name:           maven-plugin-build-helper
-Version:        1.5
-Release:        5
+Version:        1.8
+Release:        2.1%{?dist}
 Summary:        Build Helper Maven Plugin
 
-Group:          Development/Java
 License:        MIT and ASL 2.0
 URL:            http://mojo.codehaus.org/build-helper-maven-plugin/
-# The source tarball has been generated from upstream VCS:
-# svn export https://svn.codehaus.org/mojo/tags/build-helper-maven-plugin-%{version} 
-#            %{name}-%{version}
-# tar caf %{name}-%{version}.tar.xz %{name}-%{version}
-Source0:        %{name}-%{version}.tar.xz
-Patch0:         add-junit-dependency.patch
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-
 BuildArch: noarch
 
-BuildRequires: plexus-utils
-BuildRequires: maven-plugin-cobertura
-BuildRequires: maven-plugin-plugin
-BuildRequires: maven-resources-plugin
-BuildRequires: maven-compiler-plugin
-BuildRequires: maven-install-plugin
-BuildRequires: maven-jar-plugin
-BuildRequires: maven-javadoc-plugin
-BuildRequires: maven-enforcer-plugin
-BuildRequires: maven-surefire-plugin
-BuildRequires: maven-surefire-provider-junit4
-BuildRequires: maven-doxia-sitetools
-BuildRequires: mojo-parent
-BuildRequires: junit4
-Requires: plexus-utils
-Requires: mojo-parent
-Requires(post): jpackage-utils
-Requires(postun): jpackage-utils
+# The source tarball has been generated from upstream VCS:
+# svn export https://svn.codehaus.org/mojo/tags/build-helper-maven-plugin-%{version} %{name}-%{version}
+# tar caf %{name}-%{version}.tar.xz %{name}-%{version}
+Source0:        %{name}-%{version}.tar.xz
+Source1:        http://www.apache.org/licenses/LICENSE-2.0.txt
+
+BuildRequires:  maven-local
+BuildRequires:  mvn(org.apache.maven.plugin-tools:maven-plugin-annotations)
+BuildRequires:  mvn(org.apache.maven.plugins:maven-invoker-plugin)
+BuildRequires:  mvn(org.apache.maven.plugins:maven-plugin-plugin)
+BuildRequires:  mvn(org.apache.maven:maven-artifact)
+BuildRequires:  mvn(org.apache.maven:maven-core)
+BuildRequires:  mvn(org.apache.maven:maven-model)
+BuildRequires:  mvn(org.apache.maven:maven-plugin-api)
+BuildRequires:  mvn(org.apache.maven:maven-project)
+BuildRequires:  mvn(org.beanshell:bsh)
+BuildRequires:  mvn(org.codehaus.mojo:mojo-parent)
+BuildRequires:  mvn(org.codehaus.plexus:plexus-utils)
 
 %description
 This plugin contains various small independent goals to assist with
 Maven build lifecycle.
 
 %package javadoc
-Group:          Development/Java
-Summary:        Javadoc for %{name}
+Summary:        API documentation for %{name}
 
 %description javadoc
-API documentation for %{name}.
+This package provides %{summary}.
 
 %prep
 %setup -q 
-%patch0
+cp %{SOURCE1} LICENSE-2.0.txt
+%pom_add_dep org.apache.maven:maven-compat
 
 %build
-export MAVEN_REPO_LOCAL=$(pwd)/.m2/repository
-mvn-jpp \
-        -e \
-        -Dmaven2.jpp.mode=true \
-        -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
-        package javadoc:javadoc
+%mvn_build -f
 
 %install
-rm -rf %{buildroot}
+%mvn_install
 
-# jars
-install -d -m 0755 %{buildroot}%{_javadir}
-install -m 644 target/build-helper-maven-plugin-%{version}.jar \
-  %{buildroot}%{_javadir}/%{name}-%{version}.jar
-ln -s %{name}-%{version}.jar %{buildroot}%{_javadir}/%{name}.jar
+%files -f .mfiles
+%doc header.txt LICENSE-2.0.txt
+%dir %{_javadir}/%{name}
 
-(cd %{buildroot}%{_javadir} && for jar in *-%{version}*; \
-    do ln -sf ${jar} `echo $jar| sed "s|-%{version}||g"`; done)
+%files javadoc -f .mfiles-javadoc
+%doc header.txt LICENSE-2.0.txt
 
-%add_to_maven_depmap org.codehaus.mojo build-helper-maven-plugin %{version} JPP maven-plugin-build-helper
+%changelog
+* Fri Jul 26 2013 Tomas Radej <tradej@redhat.com> - 1.8-2
+- Add missing ASL license text and installed all license files
 
-# poms
-install -d -m 755 %{buildroot}%{_datadir}/maven2/poms
-install -pm 644 pom.xml \
-    %{buildroot}%{_datadir}/maven2/poms/JPP-%{name}.pom
+* Mon Jul 22 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.8-1
+- Add missing BR: maven-invoker-plugin
 
-# javadoc
-install -d -m 0755 %{buildroot}%{_javadocdir}/%{name}-%{version}
-cp -pr target/site/api*/* %{buildroot}%{_javadocdir}/%{name}-%{version}/
-ln -s %{name}-%{version} %{buildroot}%{_javadocdir}/%{name}
-rm -rf target/site/api*
+* Fri Jul 19 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.8-1
+- Update to upstream version 1.8
 
-%clean
-%{__rm} -rf %{buildroot}
+* Thu Feb 14 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.5-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 
-%post
-%update_maven_depmap
+* Wed Feb 06 2013 Java SIG <java-devel@lists.fedoraproject.org> - 1.5-7
+- Update for https://fedoraproject.org/wiki/Fedora_19_Maven_Rebuild
+- Replace maven BuildRequires with maven-local
 
-%postun
-%update_maven_depmap
+* Thu Jul 19 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.5-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
-%files
-%defattr(-,root,root,-)
-%{_javadir}/%{name}.jar
-%{_javadir}/%{name}-%{version}.jar
-%{_datadir}/maven2/poms/JPP-%{name}.pom
-%{_mavendepmapfragdir}/%{name}
+* Fri Jan 13 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.5-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
 
-%files javadoc
-%defattr(-,root,root,-)
-%{_javadocdir}/%{name}-%{version}
-%{_javadocdir}/%{name}
+* Tue Dec 06 2011 Tomas Radej <tradej@redhat.com> - 1.5-4
+- Update to current guidelines
+- Fix build
 
+* Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.5-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
+
+* Thu Oct 28 2010 Alexander Kurtakov <akurtako@redhat.com> 1.5-2
+- Maven plugins should require parent poms because they are totally unusable without them.
+
+* Thu Sep 16 2010 Alexander Kurtakov <akurtako@redhat.com> 1.5-1
+- Update to 1.5.
+- Use newer maven packages' names.
+
+* Thu Sep 10 2009 Alexander Kurtakov <akurtako@gmail.com> 1.4-1
+- Initial package.
