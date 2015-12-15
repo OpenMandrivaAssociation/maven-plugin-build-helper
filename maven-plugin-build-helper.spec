@@ -1,9 +1,9 @@
 %{?_javapackages_macros:%_javapackages_macros}
 Name:           maven-plugin-build-helper
 Version:        1.8
-Release:        2.1%{?dist}
+Release:        2.2
 Summary:        Build Helper Maven Plugin
-
+Group:	Development/Java
 License:        MIT and ASL 2.0
 URL:            http://mojo.codehaus.org/build-helper-maven-plugin/
 BuildArch: noarch
@@ -24,7 +24,7 @@ BuildRequires:  mvn(org.apache.maven:maven-model)
 BuildRequires:  mvn(org.apache.maven:maven-plugin-api)
 BuildRequires:  mvn(org.apache.maven:maven-project)
 BuildRequires:  mvn(org.beanshell:bsh)
-BuildRequires:  mvn(org.codehaus.mojo:mojo-parent)
+BuildRequires:  mvn(org.codehaus.mojo:mojo-parent:pom:)
 BuildRequires:  mvn(org.codehaus.plexus:plexus-utils)
 
 %description
