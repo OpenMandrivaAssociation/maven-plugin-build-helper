@@ -1,7 +1,7 @@
 %{?_javapackages_macros:%_javapackages_macros}
 Name:           maven-plugin-build-helper
 Version:        1.8
-Release:        2.2
+Release:        2.3
 Summary:        Build Helper Maven Plugin
 Group:	Development/Java
 License:        MIT and ASL 2.0
