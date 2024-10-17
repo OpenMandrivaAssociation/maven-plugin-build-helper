@@ -5,7 +5,7 @@ Release:        2.3
 Summary:        Build Helper Maven Plugin
 Group:	Development/Java
 License:        MIT and ASL 2.0
-URL:            http://mojo.codehaus.org/build-helper-maven-plugin/
+URL:            https://mojo.codehaus.org/build-helper-maven-plugin/
 BuildArch: noarch
 
 # The source tarball has been generated from upstream VCS:
